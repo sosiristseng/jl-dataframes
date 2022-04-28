@@ -1,19 +1,15 @@
-# Welcome to your Jupyter Book
+# Julia DataFrames Exmaple
 
-This is a small sample book to give you a feel for how book content is
-structured.
+A brief introduction to basic usage of [DataFrames](https://github.com/JuliaData/DataFrames.jl), by [Bogumił Kamiński](http://bogumilkaminski.pl/about/) in <https://github.com/bkamins/Julia-DataFrames-Tutorial/>, *December 12, 2021*.
 
-:::{note}
-Here is a note!
-:::
-
-And here is a code block:
+The tutorial contains a specification of the project environment version under
+which it should be run. In order to prepare this environment, before using the
+tutorial notebooks, while in the project folder run the following command in the
+command line:
 
 ```
-e = mc^2
+julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
 ```
-
-Check out the content pages bundled with this sample book to see more.
 
 ## Notebook execution status
 

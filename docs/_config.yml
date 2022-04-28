@@ -17,7 +17,7 @@ execute:
   run_in_temp:
     false # If `True`, then a temporary directory will be created and used as the command working directory (cwd),
     # otherwise the notebook's parent directory will be the cwd.
-  allow_errors: false # If `False`, when a code cell raises an error the execution is stopped, otherwise all cells are always run.
+  allow_errors: true # If `False`, when a code cell raises an error the execution is stopped, otherwise all cells are always run.
   stderr_output: show # One of 'show', 'remove', 'remove-warn', 'warn', 'error', 'severe'
 
 #######################################################################################
@@ -45,8 +45,8 @@ latex:
   use_jupyterbook_latex: true # use sphinx-jupyterbook-latex for pdf builds as default
 
 # Add a bibtex file so that we can create citations
-bibtex_bibfiles:
-  - references.bib
+# bibtex_bibfiles:
+#   - references.bib
 
 #######################################################################################
 # Launch button settings
@@ -59,7 +59,7 @@ launch_buttons:
 
 # Information about where the book exists on the web
 repository:
-  url: https://github.com/ntumitolab/template-juliabook # Online location of your book (GitHub is recommended)
+  url: https://github.com/sosiristseng/juliabook-dataframes # Online location of your book (GitHub is recommended)
   path_to_book: docs # Optional path to your book, relative to the repository root
   branch: main # Which branch of the repository should be used when creating links (optional)
 
