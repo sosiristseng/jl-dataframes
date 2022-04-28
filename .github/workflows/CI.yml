@@ -66,7 +66,7 @@ jobs:
             ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Manifest.toml', 'requirements.txt') }}
 
       - name: Build Jupyter Books
-        run: jb build docs --warningiserror --keep-going -v
+        run: jb build docs
 
       - name: Deploy Website
         uses: peaceiris/actions-gh-pages@v3.8.0
