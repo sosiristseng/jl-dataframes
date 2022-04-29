@@ -48,13 +48,14 @@ jobs:
             ~/.julia/compiled
             ~/.julia/packages
             ~/.julia/registries
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-${{ hashFiles('**/Manifest.toml') }}
           restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-
             ${{ runner.os }}-${{ env.cache-name }}-
       - name: Install Julia dependencies
         run: |
           julia --project=@. -e 'using Pkg; Pkg.instantiate()'
-          julia -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
+          julia -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia"); Pkg.precompile()'
       - name: Cache Jupyter book outputs
         uses: actions/cache@v3
         env:

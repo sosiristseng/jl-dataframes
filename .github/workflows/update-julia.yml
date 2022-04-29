@@ -1,7 +1,7 @@
 name: Auto update Julia dependencies
 
 env:
-  JULIA_VERSION: "1.7"
+  JULIA_VER: "1.7"
   JULIA_PKG_PRECOMPILE_AUTO: 0
   JULIA_NUM_THREADS: 2
 
@@ -16,10 +16,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Julia ${{ env.JULIA_VERSION }}
+      - name: Setup Julia ${{ env.JULIA_VER }}
         uses: julia-actions/setup-julia@v1
         with:
-          version: ${{ env.JULIA_VERSION }}
+          version: ${{ env.JULIA_VER }}
       - name: Update Julia dependencies
         run: julia --color=yes --project=@. -e 'import Pkg; Pkg.update()'
       - uses: tibdex/github-app-token@v1
