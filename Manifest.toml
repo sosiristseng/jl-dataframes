@@ -173,9 +173,9 @@ version = "3.18.0"
 
 [[deps.ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
-git-tree-sha1 = "63d1e802de0c4882c00aee5cb16f9dd4d6d7c59c"
+git-tree-sha1 = "a985dc37e357a3b22b260a5def99f3530fb415d3"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
-version = "0.11.1"
+version = "0.11.2"
 
 [[deps.ColorVectorSpace]]
 deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "SpecialFunctions", "Statistics", "TensorCore"]
