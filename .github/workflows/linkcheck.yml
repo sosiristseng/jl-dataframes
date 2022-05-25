@@ -15,4 +15,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build Jupyter Books
-        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:latest jupyter-book build /work/docs --builder linkcheck
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest jupyter-book build /work/docs --builder linkcheck
