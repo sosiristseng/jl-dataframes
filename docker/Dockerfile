@@ -8,7 +8,7 @@ COPY Project.toml Manifest.toml build.jl ./
 RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()' && julia --threads=auto --color=yes build.jl
 
 # Julia command
-# CMD ["julia"]
+CMD ["julia"]
 
 # If using sysimage
-CMD ["julia", "-Jsysimage.so"]
+# CMD ["julia", "-Jsysimage.so"]
