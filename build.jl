@@ -2,6 +2,7 @@
 import Pkg
 
 Pkg.add(["IJulia"])
+nthreads = Threads.nthreads()
 
 using IJulia
 kernelpath = IJulia.installkernel(
