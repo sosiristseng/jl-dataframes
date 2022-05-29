@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/sosiristseng/docker-juliabook:1.7.3.1
+FROM ghcr.io/sosiristseng/docker-juliabook:1.7.3.1
 
 ENV LC_ALL C.UTF-8
 
@@ -18,4 +18,3 @@ CMD ["julia"]
 
 # If using sysimage
 # CMD ["julia", "-Jsysimage.so"]
-
