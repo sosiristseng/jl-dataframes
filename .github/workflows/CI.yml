@@ -62,7 +62,7 @@ jobs:
           image: ${{ env.IMAGE_NAME }}:test
           options: -v ${{ github.workspace }}:/work
           run: |
-            find /work/docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
+            find /work/docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=1000  --execute --allow-errors --inplace {}
             jupyter-book build /work/docs -v
 
       - name: Push Docker Image
@@ -78,11 +78,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Deploy Website
-        uses: peaceiris/actions-gh-pages@v3.8.0
-        if: github.ref == 'refs/heads/main'
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force_orphan: true
-          publish_dir: docs/_build/html
-          full_commit_message: ${{ github.event.head_commit.message }}
+      # - name: Deploy Website
+      #   uses: peaceiris/actions-gh-pages@v3.8.0
+      #   if: github.ref == 'refs/heads/main'
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     force_orphan: true
+      #     publish_dir: docs/_build/html
+      #     full_commit_message: ${{ github.event.head_commit.message }}
