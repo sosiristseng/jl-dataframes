@@ -63,7 +63,7 @@ jobs:
           options: -v ${{ github.workspace }}:/work
           run: |
             find /work/docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=1000  --execute --allow-errors --inplace {}
-            jupyter-book build /work/docs -v
+            jupyter-book build /work/docs -vvv
 
       - name: Push Docker Image
         # Do not push on PR's
