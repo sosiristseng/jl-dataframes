@@ -17,34 +17,55 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  ci:
+  docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      # Docker
       - uses: docker/setup-buildx-action@v2
-
-      - name: Login to the Container registry
-        uses: docker/login-action@v2
+      - uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
+      - name: Build Docker Image
+        # if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,priority=600, event=pr
-            type=ref,priority=600, event=tag
-            type=raw,value=latest,priority=600, enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-            type=sha,enable=true,priority=100,prefix=,suffix=,format=long
-          flavor: |
-            latest=false
-
+          context: .
+          file: .ci/Dockerfile
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  execute:
+    needs: docker
+    strategy:
+      fail-fast: false
+      matrix:
+        notebook:
+          - index
+          - 01_constructors
+          - 02_basicinfo
+          - 03_missingvalues
+          - 04_loadsave
+          - 05_columns
+          - 06_rows
+          - 07_factors
+          - 08_joins
+          - 09_reshaping
+          - 10_transforms
+          - 11_performance
+          - 12_pitfalls
+          - 13_extras
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker Image
         # if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v3
@@ -54,17 +75,57 @@ jobs:
           load: true
           tags: ${{ env.IMAGE_NAME }}:test
           cache-from: type=gha
-          cache-to: type=gha,mode=max
 
-      - name: Run notebooks and build website
-        uses: addnab/docker-run-action@v3
+      - name: Build a Notebook
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --allow-errors --inplace /work/docs/${{ matrix.notebook }}.ipynb
+
+      - name: Upload a Notebook
+        uses: actions/upload-artifact@v3
         with:
-          image: ${{ env.IMAGE_NAME }}:test
-          options: -v ${{ github.workspace }}:/work
-          run: |
-            find /work/docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=1000  --execute --allow-errors --inplace {}
-            jupyter-book build /work/docs -vvv
+          name: ${{ matrix.notebook }}
+          path: docs/${{ matrix.notebook }}.ipynb
 
+  jupyter-book:
+    needs: [execute, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - run: mkdir out
+      - name: Download notebooks
+        uses: actions/download-artifact@v3
+        with:
+          path: out/
+      - name: Move notebooks
+        run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Docker Image
+        # if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:test
+          cache-from: type=gha
+
+      - name: Build website
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jupyter-book build /work/docs -v
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,priority=600, enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=sha,enable=true,priority=100,prefix=,suffix=,format=long
+          flavor: |
+            latest=false
       - name: Push Docker Image
         # Do not push on PR's
         if: github.ref == 'refs/heads/main'
