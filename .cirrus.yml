@@ -4,11 +4,11 @@ jupyter_book_task:
   auto_cancellation: true
   container:
     dockerfile: Dockerfile
-    cpu: 2
-    memory: 8G
+    cpu: 4
+    memory: 16G
     use_in_memory_disk: true
   notebook_script: |
-    find . -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --allow-errors --inplace {}
+    find . -type f -name "*.ipynb" -print0 | parallel -0 -j4 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --allow-errors --inplace {}
     mkdir -p out
     cp *.ipynb out/
   pages_script: |
