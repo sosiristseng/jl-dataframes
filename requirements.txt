@@ -1,0 +1,2 @@
+ghp-import==2.1.0
+nbconvert==6.5.3
