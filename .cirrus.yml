@@ -14,6 +14,8 @@ jupyter_book_task:
     cp *.ipynb out/
   pages_script: |
     if [[ $CIRRUS_BRANCH == "main" ]]; then
+      git config --global user.name "Wen-Wei Tseng"
+      git config --global user.email sosiristseng@gmail.com
       git remote set-url origin https://${GH_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git
       ghp-import -n -o out
     fi
