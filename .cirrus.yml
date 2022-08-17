@@ -17,5 +17,5 @@ jupyter_book_task:
       git config --global user.name "Wen-Wei Tseng"
       git config --global user.email sosiristseng@gmail.com
       git remote set-url origin https://${GH_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git
-      ghp-import -nop out
+      ghp-import -n -p -f out
     fi
