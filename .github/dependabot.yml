@@ -15,7 +15,7 @@ updates:
       - 'automerge'
     open-pull-requests-limit: 10
   - package-ecosystem: 'docker'
-    directory: '/'
+    directory: '/.ci'
     schedule:
       interval: 'daily'
     labels:
