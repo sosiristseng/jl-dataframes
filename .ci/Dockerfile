@@ -14,7 +14,7 @@ COPY --from=julia:1.7.3 ${JULIA_PATH} /usr/local/
 RUN apt-get update && apt-get install -y git parallel --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Python dependencies
-COPY requirements.txt .
+COPY .ci/requirements.txt .
 RUN pip install --no-cache-dir -U pip wheel setuptools \
     && pip install --no-cache-dir -r requirements.txt
 
