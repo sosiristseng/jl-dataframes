@@ -1,4 +1,5 @@
 # Julia DataFrames.jl examples
 
-By Bogumił Kamiński https://github.com/bkamins/Julia-DataFrames-Tutorial/
+DataFrames.jl examples by Bogumił Kamiński https://github.com/bkamins/Julia-DataFrames-Tutorial/
 
+Rendered by `jupyter-book`
