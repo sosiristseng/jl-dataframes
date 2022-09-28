@@ -72,7 +72,7 @@ jobs:
           -v ${{ github.workspace }}:/work
           -e JULIA_NUM_THREADS=auto
           ${{ env.IMAGE_NAME }}:test
-          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.TIMEOUT }} --execute --inplace
+          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.TIMEOUT }} --execute --allow-errors --inplace
           /work/docs/${{ matrix.notebook }}.ipynb
       - name: Upload Notebook
         uses: actions/upload-artifact@v3
@@ -98,7 +98,7 @@ jobs:
       - name: Move notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
-        run: jupyter-book build docs/ -W -v
+        run: jupyter-book build docs/ -v
       - name: Set output flag
         id: setoutput
         run: echo "::set-output name=success::true"
