@@ -4,11 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1' # Every week
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/**'
 
 env:
   JULIA_PKG_PRECOMPILE_AUTO: '0'
