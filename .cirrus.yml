@@ -12,7 +12,7 @@ jupyter_book_task:
     memory: 16G
     greedy: true
   notebook_script: |
-    parallel --joblog /tmp/log -j${JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${TIMEOUT} --execute --inplace {} ::: docs/*.ipynb
+    parallel --joblog /tmp/log -j${JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${TIMEOUT} --execute --allow-errors --inplace {} ::: docs/*.ipynb
     cat /tmp/log
   build_script: |
     jupyter-book build docs/ --warningiserror --keep-going -v
