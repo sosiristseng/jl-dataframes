@@ -1,17 +1,18 @@
-FROM sosiristseng/docker-jupyterbook:0.13.1.7
+FROM julia:1.8.5 AS julia
+
+FROM ghcr.io/sosiristseng/docker-jupyterbook:0.13.1.7
+
+# Julia
+ENV JULIA_PATH /usr/local/julia/
+ENV PATH ${JULIA_PATH}/bin:${PATH}
+COPY --from=julia ${JULIA_PATH} ${JULIA_PATH}
 
 # System packages
 # RUN apt-get update && apt-get install -y git parallel --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-# Julia
-ENV JULIA_NUM_THREADS "auto"
-ENV JULIA_PATH /usr/local/julia/
-ENV PATH ${JULIA_PATH}/bin:${PATH}
-COPY --from=julia:1.8.5 ${JULIA_PATH} ${JULIA_PATH}
-
 # Python dependencies e.g. matplotlib
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt
 
 # Julia environment
 COPY Project.toml Manifest.toml ./

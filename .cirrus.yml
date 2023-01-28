@@ -1,13 +1,13 @@
 jupyter_book_task:
   # Only on the main branch, tags, and PR
-  only_if: $CIRRUS_BRANCH == $CIRRUS_DEFAULT_BRANCH || $CIRRUS_TAG != '' || $CIRRUS_PR != ''
+  only_if: $CIRRUS_BRANCH == $CIRRUS_DEFAULT_BRANCH || $CIRRUS_BASE_BRANCH == $CIRRUS_DEFAULT_BRANCH
   env:
     JOBS: 8
     TIMEOUT: 1000
     GH_TOKEN: ENCRYPTED[c10d05d3caf07e913a481bb301a070e3db1167fe227826d1f7c2348093fbfecd1f73e88a442c3402bde3ecb541b5d4f3]
   auto_cancellation: true
   container:
-    dockerfile: cirrus.Dockerfile
+    dockerfile: julia.Dockerfile
     cpu: 4
     memory: 16G
     greedy: true
