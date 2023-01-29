@@ -7,7 +7,7 @@ jupyter_book_task:
     GH_TOKEN: ENCRYPTED[c10d05d3caf07e913a481bb301a070e3db1167fe227826d1f7c2348093fbfecd1f73e88a442c3402bde3ecb541b5d4f3]
   auto_cancellation: true
   container:
-    dockerfile: julia.Dockerfile
+    dockerfile: .github/cirrus.Dockerfile
     cpu: 4
     memory: 16G
     greedy: true
