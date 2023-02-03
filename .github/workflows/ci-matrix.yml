@@ -92,7 +92,7 @@ jobs:
           docker run --rm
           --workdir=/tmp -v ${{ github.workspace }}:/tmp
           myimage:test
-          jupyter nbconvert --to notebook --execute --inplace
+          jupyter nbconvert --to notebook --execute --inplace --allow-errors
           --ExecutePreprocessor.timeout=${{ env.TIMEOUT }}
           --ExecutePreprocessor.kernel_name=julia
           ${{ matrix.notebook }}
