@@ -3,7 +3,7 @@ jupyter_book_task:
   env:
     JOBS: 8
     TIMEOUT: 600
-    GH_TOKEN: ENCRYPTED[0146fcd58e501a847f528c70d9449f831de345227a4cdc1cd7c8407559938e6cb203fa51ab5c828f2d0e97b40931f1fa]
+    GH_TOKEN: ENCRYPTED[!04189b6db63eaba858d6fe34cdb03b95e6cae73980fe91b4631181cf2fc8f5dbe376202c32d86be51999e102557d13af!]
   auto_cancellation: true
   container:
     dockerfile: .github/cirrus.Dockerfile
