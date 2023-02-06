@@ -34,9 +34,9 @@ version = "3.5.1+1"
 
 [[deps.Arrow]]
 deps = ["ArrowTypes", "BitIntegers", "CodecLz4", "CodecZstd", "DataAPI", "Dates", "LoggingExtras", "Mmap", "PooledArrays", "SentinelArrays", "Tables", "TimeZones", "UUIDs", "WorkerUtilities"]
-git-tree-sha1 = "e97bdb5e241bb57f628968fd56efd9590078ada4"
+git-tree-sha1 = "4e40f4868281b7fd702c605c764ab82a52ac3f4b"
 uuid = "69666777-d1a9-59fb-9406-91d4454c9d45"
-version = "2.4.2"
+version = "2.4.3"
 
 [[deps.ArrowTypes]]
 deps = ["UUIDs"]
