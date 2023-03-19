@@ -1,1 +1,1 @@
-FROM ghcr.io/sosiristseng/jl-dataframes:binder
+FROM ghcr.io/ww-jl/dataframes:binder
