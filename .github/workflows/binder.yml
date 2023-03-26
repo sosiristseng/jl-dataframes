@@ -9,11 +9,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  packages: write
-  contents: write
-  pull-requests: write
-
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
   PYTHON_VER: '3.11'
@@ -21,6 +16,10 @@ env:
 jobs:
   binder:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
+      pull-requests: write
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
@@ -32,13 +31,15 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VER }}
     - name: Install repo2docker
-      run: python3 -m pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
+      run: pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Pull Image
+      run: docker pull ${{ env.IMAGE_NAME }} || true
     - name: Build binder image with repo2docker
       run: >
         jupyter-repo2docker

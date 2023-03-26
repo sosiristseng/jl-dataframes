@@ -1,4 +1,4 @@
-name: Execute Jupyter notebooks with dynamic parallel matrix
+name: CI with dynamic parallel matrix
 
 on:
   push:
@@ -14,7 +14,6 @@ env:
   TIMEOUT: 600
   DFILE: '.github/Dockerfile'
   IMAGE_NAME: 'app:test'
-  PY_VER: '3.11'
 
 jobs:
   setup:
@@ -37,14 +36,16 @@ jobs:
           cache-to: type=gha,mode=max
       - name: List notebooks as a JSON array
         id: set-matrix
-        run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("docs/*.ipynb")))')" >> $GITHUB_OUTPUT
+        working-directory: docs
+        run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("**.ipynb", recursive=True)))')" >> $GITHUB_OUTPUT
   execute:
     needs: setup
     strategy:
       max-parallel: 20
       fail-fast: false
       matrix:
-        notebook: ${{ fromJSON(needs.setup.outputs.matrix) }} # Notebooks need to be executed
+        # Notebooks need to be executed
+        notebook: ${{ fromJSON(needs.setup.outputs.matrix) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -67,18 +68,20 @@ jobs:
           jupyter nbconvert --to notebook --execute --inplace --allow-errors
           --ExecutePreprocessor.timeout=${{ env.TIMEOUT }}
           --ExecutePreprocessor.kernel_name=julia-$(julia -e 'print(VERSION.major,".",VERSION.minor)')
-          ${{ matrix.notebook }}
+          docs/${{ matrix.notebook }}
       - name: Upload Notebook
         uses: actions/upload-artifact@v3
         with:
           name: notebook
-          path: ${{ matrix.notebook }}
+          path: docs*/${{ matrix.notebook }}
           retention-days: 1
 
   jupyter-book:
     needs: execute
     runs-on: ubuntu-latest
-    # store success output flag for the ci job
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.1
+    # output success flag for CI
     outputs:
       success: ${{ steps.setoutput.outputs.success }}
     steps:
@@ -93,13 +96,7 @@ jobs:
         run: ls -R
         working-directory: out
       - name: Move notebooks
-        run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PY_VER }}
-      - name: Install Jupyter book
-        run: pip install jupyter-book
+        run: mv -v out/docs/* docs/
       - name: Build website
         run: jupyter-book build docs/
       - name: Upload pages artifact
@@ -111,10 +108,9 @@ jobs:
         id: setoutput
         run: echo "success=true" >> $GITHUB_OUTPUT
 
-  # CI job for GitHub status check
+  # CI conclusion for GitHub status check
   # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
-  ci:
-    name: CI (matrix)
+  CI:
     needs: jupyter-book
     if: always()
     runs-on: ubuntu-latest
