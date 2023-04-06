@@ -1,4 +1,4 @@
-FROM FROM ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.2 as base
+FROM ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.2 as base
 
 FROM base
 
