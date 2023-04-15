@@ -49,7 +49,7 @@ jobs:
       - name: List notebooks as a JSON array
         id: set-matrix
         working-directory: docs
-        run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("**.ipynb", recursive=True)))')" >> $GITHUB_OUTPUT
+        run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("**/*.ipynb", recursive=True)))')" >> $GITHUB_OUTPUT
 
   execute:
     needs: setup
@@ -62,10 +62,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/sosiristseng/juliabook:1.8.5.7
-      env:
-        JULIA_NUM_THREADS: 'auto'
-        # Let PythonCall use built-in python
-        JULIA_CONDAPKG_BACKEND: 'Null'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -91,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: notebook
-          path: docs*/${{ matrix.notebook }}
+          path: docs*/${{ matrix.notebook }}  # keep folder structure
           retention-days: 1
 
   jupyter-book:
@@ -117,11 +113,13 @@ jobs:
         run: mv -v out/docs/* docs/
       - name: Build website
         run: jupyter-book build docs/
-      - name: Upload pages artifact
+      - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: actions/upload-pages-artifact@v1
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: docs/_build/html
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html/
+          force_orphan: true
       - name: Set output flag
         id: setoutput
         run: echo "success=true" >> $GITHUB_OUTPUT
@@ -145,66 +143,3 @@ jobs:
             echo "Tests failed"
             exit 1
           fi
-
-  binder:
-    needs: jupyter-book
-    if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
-      PYTHON_VER: '3.11'
-    steps:
-      - name: Checkout notebook branch
-        uses: actions/checkout@v3
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Install repo2docker
-        run:
-          pip install -U pip setuptools wheel
-          pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull Image
-        run: docker pull ${{ env.IMAGE_NAME }} || true
-      - name: Build binder image with repo2docker
-        run: >
-          jupyter-repo2docker
-          --image-name ${{ env.IMAGE_NAME }}
-          --cache-from ${{ env.IMAGE_NAME }}
-          --push --no-run --user-id 1000 --user-name jovyan
-          .
-      - name: Add back binder folder and Dockerfile
-        run: |
-          mkdir -p .binder
-          echo "FROM ${{ env.IMAGE_NAME }}" > .binder/Dockerfile
-      - name: Create Pull Request if binder Dockerfile has changed
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: Binder Dockerfile
-          add-paths: .binder/Dockerfile
-          branch: binder-dockerfile
-
-  # Deployment job
-  deploy:
-    needs: jupyter-book
-    if: ${{ github.ref == 'refs/heads/main' }}
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-    permissions:
-      pages: write # to deploy to Pages
-      id-token: write # to verify the deployment originates from an appropriate source
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
