@@ -94,7 +94,7 @@ jobs:
     needs: execute
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.4
+      image: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.5
     # output success flag for CI
     outputs:
       success: ${{ steps.setoutput.outputs.success }}
