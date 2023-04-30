@@ -70,7 +70,7 @@ jobs:
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
           path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
+          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('*.toml') }}
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
@@ -106,13 +106,17 @@ jobs:
         with:
           name: notebook
           path: out/
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: out
       - name: Move notebooks
         run: mv -v out/docs/* docs/
       - name: Build website
         run: jupyter-book build docs/
+      - name: Copy environment files for binder
+        env:
+          DEST: docs/_build/html/_sources
+        run: |
+          cp *.txt $DEST || true
+          cp Project.toml Manifest.toml $DEST
+          cp -R src $DEST
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v3
@@ -143,3 +147,10 @@ jobs:
             echo "Tests failed"
             exit 1
           fi
+  binder:
+    needs: jupyter-book
+    if: ${{ github.ref == 'refs/heads/main' }}
+    uses: sosiristseng/juliabook/.github/workflows/binder.yml@main
+    with:
+       dir: _sources
+       ref: gh-pages
