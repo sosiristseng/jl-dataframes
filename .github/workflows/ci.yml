@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  JULIA_CACHE: '1'
+  JULIA_CACHE: '2'
   TIMEOUT: '-1'
   EXTRA_ARGS: '--allow-errors'
 
@@ -31,13 +31,13 @@ jobs:
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
           path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
+          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('*.toml') }}
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         run: |
           julia --color=yes --project="" -e 'import Pkg; Pkg.Registry.update(); Pkg.add("IJulia"); Pkg.build("IJulia")'
-          julia --color=yes --project=@. -e 'import Pkg;  Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+          julia --color=yes --project=@. -e 'import Pkg;  Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc()'
       - name: List notebooks as a JSON array
         id: set-matrix
         working-directory: docs
@@ -62,8 +62,7 @@ jobs:
         uses: actions/cache/restore@v3
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
-          path: |
-            ~/.julia
+          path: ~/.julia
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('*.toml') }}
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
