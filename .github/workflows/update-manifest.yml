@@ -6,16 +6,16 @@ on:
     - cron: '0 0 * * 1' # Every week
   push:
     branches:
-      main
+      - main
     paths:
-      .github/workflows/update-manifest.yml
+      - .github/workflows/update-manifest.yml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  update:
+  update-manifest:
     permissions:
       contents: write
       pull-requests: write
@@ -23,5 +23,5 @@ jobs:
     with:
       julia-version: '1'
     secrets:
-      APP_ID: ${{ secrets.APP_ID }}
+      APP_ID: ${{ secrets.APP_ID }} # https://github.com/apps/wen-wei-s-pr-bot
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
