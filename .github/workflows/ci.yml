@@ -20,15 +20,16 @@ env:
 jobs:
   setup:
     runs-on: ubuntu-latest
-    container:
-      image: python:3.11.3-slim
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install Python dependencies
-        run: pip install -r requirements.txt
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
+        with:
+          python-version: ${{ env.PYTHON_VER }}
       - name: Read Julia version
         id: read_toml
         run: |
@@ -42,24 +43,28 @@ jobs:
         uses: actions/cache/restore@v3
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
-          path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('*.toml') }}
+          path: |
+            ~/.julia
+            ~/.local/share/jupyter
+          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('Manifest.toml') }}
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         run: |
-          julia --color=yes --project="" -e 'import Pkg; Pkg.Registry.update(); Pkg.add("IJulia"); Pkg.build("IJulia")'
-          julia --color=yes --project=@. -e 'import Pkg;  Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc()'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.Registry.update(); Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc()'
+          julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.", env=Dict("JULIA_NUM_THREADS"=>"auto"))'
       - name: Save Julia dependencies
         uses: actions/cache/save@v3
         if: ${{ steps.restore-cache.outputs.cache-hit != 'true' && env.JULIA_CACHE != '0' }}
         with:
-          path: ~/.julia
+          path: |
+            ~/.julia
+            ~/.local/share/jupyter
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
       - name: List notebooks as a JSON array
         id: set-matrix
         working-directory: docs
-        run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("**/*.ipynb", recursive=True)))')" >> $GITHUB_OUTPUT
+        run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("**/*.ipynb", recursive=True)))')" >> "$GITHUB_OUTPUT"
 
   execute:
     needs: setup
@@ -70,13 +75,16 @@ jobs:
         # Notebooks need to be executed
         notebook: ${{ fromJSON(needs.setup.outputs.matrix) }}
     runs-on: ubuntu-latest
-    container:
-      image: python:3.11.3-slim
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
+        with:
+          python-version: ${{ env.PYTHON_VER }}
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: pip install nbconvert -r requirements.txt
       - name: Read Julia version
         id: read_toml
         run: |
@@ -90,13 +98,15 @@ jobs:
         uses: actions/cache/restore@v3
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
-          path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('*.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
+          path: |
+            ~/.julia
+            ~/.local/share/jupyter
+          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('Manifest.toml') }}
       - name: Install Julia kernel
+        if: ${{ steps.restore-cache.outputs.cache-hit != 'true' && env.JULIA_CACHE != '0' }}
         run: |
-          julia --color=yes --project="" -e 'import Pkg; Pkg.build("IJulia"); Pkg.resolve(); Pkg.precompile()'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.Registry.update(); Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+          julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
       - name: Execute Notebook
         run: >
           jupyter nbconvert --to notebook --execute --inplace ${{ env.EXTRA_ARGS }}
@@ -151,68 +161,6 @@ jobs:
       - name: Set output flag
         id: setoutput
         run: echo "success=true" >> $GITHUB_OUTPUT
-
-  binder:
-    name: Build binder image
-    needs: jupyter-book
-    if: ${{ github.ref == 'refs/heads/main' }}
-    permissions:
-      packages: write
-      contents: write
-      pull-requests: write
-    env:
-      IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Remove existing binder dockerfile
-        run: |
-          rm -rf .binder || true
-      - name: Download built notebooks
-        uses: actions/download-artifact@v3
-        with:
-          name: notebooks
-          path: out/
-      - name: Copy back built notebooks
-        run: cp --verbose -rf out/docs/* docs/
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Install repo2docker
-        run: |
-          pip install -U pip setuptools wheel
-          pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull Image
-        run: docker pull ${{ env.IMAGE_NAME }} || true
-      - name: Build binder image with repo2docker
-        run: >
-          jupyter-repo2docker
-          --user-id 1000 --user-name jovyan
-          --image-name ${{ env.IMAGE_NAME }}
-          --cache-from ${{ env.IMAGE_NAME }}
-          --push --no-run
-          .
-      - name: Add binder Dockerfile
-        run: |
-          mkdir -p .binder
-          echo "FROM ${{ env.IMAGE_NAME }}" > .binder/Dockerfile
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: Binder dockerfile update
-          branch: binderfile
-          add-paths: |
-            .binder/Dockerfile
 
   # CI conclusion for GitHub status check
   # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
