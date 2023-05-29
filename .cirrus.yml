@@ -2,7 +2,7 @@ jupyter_book_task:
   only_if: $CIRRUS_BRANCH == 'main' || $CIRRUS_TAG != '' || $CIRRUS_PR != ''
   auto_cancellation: true
   env:
-    JOBS: '8'
+    JOBS: '12'
     TIMEOUT: '-1'
     EXTRA_ARGS: '--allow-errors'
   container:
