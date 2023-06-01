@@ -4,8 +4,8 @@ on:
 
 name: After Cirrus CI
 jobs:
-  continue:
-    name: Notify Cirrus CI Failure
+  ci:
+    name: CI
     if: >-
       github.event.check_suite.app.name == 'Cirrus CI'
       && github.event.check_suite.conclusion != 'success'
@@ -20,7 +20,12 @@ jobs:
           mediaType: '{"previews": ["antiope"]}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
+      - name: Notify Cirrus CI error
+        if: >-
+          github.event.check_suite.conclusion != 'success'
+          && github.event.check_suite.conclusion != 'cancelled'
+          && github.event.check_suite.conclusion != 'neutral'
+        run: |
           echo "Cirrus CI ${{ github.event.check_suite.conclusion }} on ${{ github.event.check_suite.head_branch }} branch!"
           echo "SHA ${{ github.event.check_suite.head_sha }}"
           echo $MESSAGE
