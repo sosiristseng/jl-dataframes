@@ -12,7 +12,7 @@ ENV JULIA_CONDAPKG_BACKEND "Null"
 ENV JULIA_PATH /usr/local/julia/
 ENV JULIA_DEPOT_PATH /srv/juliapkg/
 ENV PATH ${JULIA_PATH}/bin:${PATH}
-COPY --from=julia:1.9.0 ${JULIA_PATH} ${JULIA_PATH}
+COPY --from=julia:1.9.1 ${JULIA_PATH} ${JULIA_PATH}
 
 FROM base
 
