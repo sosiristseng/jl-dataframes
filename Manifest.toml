@@ -1,8 +1,8 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.9.0"
+julia_version = "1.9.1"
 manifest_format = "2.0"
-project_hash = "f4da414a0336a300896440f95449976c5af9f445"
+project_hash = "5f3f4fea32342642f39f688ef2258e495e047469"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -42,15 +42,15 @@ version = "3.5.1+1"
 
 [[deps.Arrow]]
 deps = ["ArrowTypes", "BitIntegers", "CodecLz4", "CodecZstd", "ConcurrentUtilities", "DataAPI", "Dates", "EnumX", "LoggingExtras", "Mmap", "PooledArrays", "SentinelArrays", "Tables", "TimeZones", "TranscodingStreams", "UUIDs"]
-git-tree-sha1 = "e067aceb829ac73a8d374bff92d6cbe09162e99a"
+git-tree-sha1 = "954666e252835c4cf8819ce4ffaf31073c1b7233"
 uuid = "69666777-d1a9-59fb-9406-91d4454c9d45"
-version = "2.6.1"
+version = "2.6.2"
 
 [[deps.ArrowTypes]]
 deps = ["Sockets", "UUIDs"]
-git-tree-sha1 = "3e57d479e398f235456a8d0572074204459e8175"
+git-tree-sha1 = "8c37bfdf1b689c6677bbfc8986968fe641f6a299"
 uuid = "31f734f8-188a-4ce0-8406-c8a06bd891cd"
-version = "2.2.1"
+version = "2.2.2"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -1478,7 +1478,7 @@ version = "0.15.1+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.7.0+0"
+version = "5.8.0+0"
 
 [[deps.libfdk_aac_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
