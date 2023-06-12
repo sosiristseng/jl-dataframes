@@ -1,0 +1,22 @@
+jupyter_book_task:
+  only_if: $CIRRUS_BRANCH == 'main' || $CIRRUS_TAG != '' || $CIRRUS_PR != ''
+  auto_cancellation: true
+  env:
+    JOBS: '8'
+    TIMEOUT: '-1'
+    EXTRA_ARGS: '--allow-errors'
+  container:
+    dockerfile: .github/Dockerfile
+    cpu: 4
+    memory: 16G
+    greedy: true
+  notebook_script: >
+    find docs/ -name '*.ipynb' |
+    parallel -j${JOBS} --joblog /tmp/log
+    jupyter nbconvert --to notebook
+    --ExecutePreprocessor.timeout=${TIMEOUT}
+    --ExecutePreprocessor.kernel_name=$(julia -e 'print("julia-", VERSION.major, ".", VERSION.minor)')
+    --execute --inplace ${EXTRA_ARGS}
+  stats_script: cat /tmp/log
+  notebooks_artifacts:
+    path: "docs/**"
