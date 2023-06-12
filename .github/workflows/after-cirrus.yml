@@ -38,9 +38,10 @@ jobs:
       && github.event.check_suite.head_branch == 'main'
       && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:latest
     env:
       ARTIFACT_NAME: 'notebooks.zip'
-      PYTHON_VER: '3.11'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -51,16 +52,6 @@ jobs:
       - name: Display notebooks
         run: ls -R
         working-directory: docs/
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-          cache: 'pip'
-          cache-dependency-path: |
-            .github/requirements.txt
-      - name: Install Python dependencies
-        run: pip install -r .github/requirements.txt
       - name: Build website
         run: jupyter-book build docs/
       - name: Upload artifact for GH pages
