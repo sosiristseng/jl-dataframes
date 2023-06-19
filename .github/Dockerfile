@@ -11,6 +11,7 @@ ENV JULIA_NUM_THREADS "auto"
 ENV JULIA_CONDAPKG_BACKEND "Null"
 ENV JULIA_PATH /usr/local/julia/
 ENV JULIA_DEPOT_PATH /srv/juliapkg/
+ENV JULIA_CPU_TARGET "generic;znver3"
 ENV PATH ${JULIA_PATH}/bin:${PATH}
 COPY --from=julia:1.9.1 ${JULIA_PATH} ${JULIA_PATH}
 
