@@ -1,4 +1,4 @@
-jupyter_book_task:
+ci_task:
   only_if: $CIRRUS_BRANCH == 'main' || $CIRRUS_BASE_BRANCH == 'main' || $CIRRUS_TAG != ''
   execution_lock: $CIRRUS_CHANGE_IN_REPO
   auto_cancellation: true
