@@ -14,7 +14,7 @@ concurrency:
 env:
   TIMEOUT: '-1'
   EXTRA_ARGS: '--allow-errors'   # Extra arguments for nbconvert
-  JULIA_CACHE: '1' # Set this '0' to disable caching
+  JULIA_CACHE: '2' # Set this '0' to disable caching
   JULIA_NUM_THREADS: 'auto'
   JULIA_CPU_TARGET: 'generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);broadwell'
 
