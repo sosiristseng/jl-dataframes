@@ -36,7 +36,10 @@ jobs:
       - name: Load docker image
         run: docker load -i /tmp/image.tar || true
       - name: Build docker image
-        run: docker build --cache-from ${{ env.IMAGE_NAME }} -t ${{ env.IMAGE_NAME }} -f ${{ env.DFILE }} --output type=tar,dest=/tmp/image.tar .
+        run: docker build --cache-from ${{ env.IMAGE_NAME }} -t ${{ env.IMAGE_NAME }} -f ${{ env.DFILE }} .
+      - name: Save docker image
+        run: docker save -o /tmp/image.tar ${{ env.IMAGE_NAME }}
+        if: steps.cache.outputs.cache-hit != 'true'
       - name: List notebooks as a JSON array
         id: set-matrix
         working-directory: docs
