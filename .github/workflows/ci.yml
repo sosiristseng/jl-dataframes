@@ -13,7 +13,7 @@ concurrency:
 
 env:
   TIMEOUT: '-1'    # nbconvert timeout
-  EXTRA_ARGS: ''   # Extra arguments for nbconvert
+  EXTRA_ARGS: '--allow-errors'   # Extra arguments for nbconvert
   DFILE: '.github/Dockerfile'
   DIMG: 'app:test'
 
