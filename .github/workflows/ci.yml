@@ -45,7 +45,7 @@ jobs:
           file: '.github/Dockerfile'
           tags: ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
           push: true
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}-cache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}-cache,mode=max
       - name: List notebooks as a JSON array
         id: set-matrix
