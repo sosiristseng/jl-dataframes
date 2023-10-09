@@ -83,9 +83,9 @@ version = "0.1.7"
 
 [[deps.BitIntegers]]
 deps = ["Random"]
-git-tree-sha1 = "abb894fb55122b4604af0d460d3018e687a60963"
+git-tree-sha1 = "a55462dfddabc34bc97d3a7403a2ca2802179ae6"
 uuid = "c3b6d118-76ef-56ca-8cc7-ebb389d030a1"
-version = "0.3.0"
+version = "0.3.1"
 
 [[deps.Blosc]]
 deps = ["Blosc_jll"]
@@ -122,10 +122,10 @@ uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 version = "0.10.11"
 
 [[deps.Cairo_jll]]
-deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "4b859a208b2397a7a623a03449e4636bdb17bcf2"
+deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
+git-tree-sha1 = "d3cc53959197e659a85f4fac191045245db8c39b"
 uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
-version = "1.16.1+1"
+version = "1.18.0+0"
 
 [[deps.Calculus]]
 deps = ["LinearAlgebra"]
@@ -159,9 +159,9 @@ version = "1.16.0"
 
 [[deps.Clustering]]
 deps = ["Distances", "LinearAlgebra", "NearestNeighbors", "Printf", "Random", "SparseArrays", "Statistics", "StatsBase"]
-git-tree-sha1 = "b86ac2c5543660d238957dbde5ac04520ae977a7"
+git-tree-sha1 = "05f9816a77231b07e634ab8715ba50e5249d6f76"
 uuid = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
-version = "0.15.4"
+version = "0.15.5"
 
 [[deps.CodecLz4]]
 deps = ["Lz4_jll", "TranscodingStreams"]
@@ -285,12 +285,13 @@ version = "1.9.1"
 
 [[deps.Distances]]
 deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
-git-tree-sha1 = "b6def76ffad15143924a2199f72a5cd883a2e8a9"
+git-tree-sha1 = "5225c965635d8c21168e32a12954675e7bea1151"
 uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-version = "0.10.9"
-weakdeps = ["SparseArrays"]
+version = "0.10.10"
+weakdeps = ["ChainRulesCore", "SparseArrays"]
 
     [deps.Distances.extensions]
+    DistancesChainRulesCoreExt = "ChainRulesCore"
     DistancesSparseArraysExt = "SparseArrays"
 
 [[deps.Distributed]]
@@ -738,9 +739,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[deps.LoggingExtras]]
 deps = ["Dates", "Logging"]
-git-tree-sha1 = "0d097476b6c381ab7906460ef1ef1638fbce1d91"
+git-tree-sha1 = "c1dd6d7978c12545b4179fb6153b9250c96b0075"
 uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
-version = "1.0.2"
+version = "1.0.3"
 
 [[deps.Lz4_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -896,9 +897,9 @@ version = "10.42.0+0"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "35882aa39079c44ea6c1f07827f98dc78bf1ce91"
+git-tree-sha1 = "fcf8fd477bd7f33cb8dbb1243653fb0d415c256c"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.11.22"
+version = "0.11.25"
 
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
@@ -1035,9 +1036,9 @@ version = "1.2.2"
 
 [[deps.RelocatableFolders]]
 deps = ["SHA", "Scratch"]
-git-tree-sha1 = "90bc7a7c96410424509e4263e277e43250c05691"
+git-tree-sha1 = "ffdaf70d81cf6ff22c2b6e733c900c3321cab864"
 uuid = "05181044-ff0b-4ac5-8273-598c1e38db00"
-version = "1.0.0"
+version = "1.0.1"
 
 [[deps.Requires]]
 deps = ["UUIDs"]
