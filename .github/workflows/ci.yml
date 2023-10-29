@@ -13,7 +13,7 @@ concurrency:
 
 env:
   TIMEOUT: '-1'    # nbconvert timeout
-  EXTRA_ARGS: '--allow-errors'   # Extra arguments for nbconvert
+  EXTRA_ARGS: ''   # Extra arguments for nbconvert
   PYTHON_VER: '3.11'
   JULIA_CPU_TARGET: 'generic;haswell,clone_all'
   JULIA_NUM_THREADS: auto
@@ -75,11 +75,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: julia:1.9.3
-      env:
-        JULIA_CPU_TARGET: 'generic;haswell,clone_all'
-        JULIA_NUM_THREADS: auto
-        JULIA_CONDAPKG_BACKEND: 'Null'
-        JULIA_CI: 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -131,9 +126,6 @@ jobs:
   render:
     needs: execute
     runs-on: ubuntu-latest
-    # store success output flag for the ci job
-    outputs:
-      success: ${{ steps.setoutput.outputs.success }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -162,23 +154,16 @@ jobs:
         uses: actions/upload-pages-artifact@v2
         with:
           path: docs/_build/html
-      - name: Set output flag
-        id: setoutput
-        run: echo "success=true" >> $GITHUB_OUTPUT
 
   # CI conclusion for GitHub status check
-  # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
+  # Adaped from https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
   CI:
     needs: render
     if: always()
     runs-on: ubuntu-latest
     steps:
-      # pass step only when output of previous jupyter-book job is set
-      # in case at least one of the execution fails, jupyter-book is skipped
-      # and the output will not be set, which will then cause the ci job to fail
       - run: |
-          passed="${{ needs.render.outputs.success }}"
-          if [[ $passed == "true" ]]; then
+          if [[ ${{ needs.render.result }} == "success" ]]; then
             echo "Tests passed"
             exit 0
           else
