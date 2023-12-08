@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NJOBS: '4'
+  NJOBS: '2'
   TIMEOUT: '-1'    # nbconvert timeout
   EXTRA_ARGS: '--allow-errors'   # Extra arguments for nbconvert
   CACHE_NUM: '1'
