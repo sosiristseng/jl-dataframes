@@ -74,6 +74,8 @@ jobs:
           ~/.julia
           !~/.julia/registries
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
+    - name: Install IJulia kernel
+      run: julia --color=yes -e 'using IJulia; installkernel("Julia", "--project=@.")'
     - name: Execute Notebook
       run: >
         parallel -j${NJOBS} jupyter nbconvert --to notebook --execute --inplace ${{ env.EXTRA_ARGS }}
