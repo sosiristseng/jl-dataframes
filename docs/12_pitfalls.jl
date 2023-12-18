@@ -61,12 +61,13 @@ s = view(x, 5:6, :)
 #---
 delete!(x, 3:6)
 
-#---
-try
-    s ## error
-catch e
-    show(e)
-end
+#===
+This is an error
+
+```julia
+s ## Will return BoundsError
+```
+===#
 
 # ## Single column selection for `DataFrame` creates aliases with ! and `getproperty` syntax and copies with :
 
@@ -76,6 +77,8 @@ x.c = x[:, 1] ## copy
 x.d = x[!, 1][:] ## copy
 x.e = copy(x[!, 1]) ## explicit copy
 display(x)
+
+#---
 x[1, 1] = 100
 display(x)
 

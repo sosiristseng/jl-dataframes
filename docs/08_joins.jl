@@ -62,7 +62,11 @@ innerjoin(x, y, on=[:id1, :id2], matchmissing=:equal)
 outerjoin(x, y, on=:id1, makeunique=true, indicator=:source, matchmissing=:equal)
 
 # you can force validation of uniqueness of key on which you join
-innerjoin(x, y, on=:id1, makeunique=true, validate=(true, true), matchmissing=:equal)
+try
+    innerjoin(x, y, on=:id1, makeunique=true, validate=(true, true), matchmissing=:equal)
+catch e
+    show(e)
+end
 
 #  mixed `on` argument for joining on multiple columns
 x = DataFrame(id1=1:6, id2=[1, 2, 1, 2, 1, 2], x1='a':'f')
