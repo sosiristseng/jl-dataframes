@@ -599,9 +599,9 @@ version = "3.0.1+0"
 
 [[deps.KernelDensity]]
 deps = ["Distributions", "DocStringExtensions", "FFTW", "Interpolations", "StatsBase"]
-git-tree-sha1 = "90442c50e202a5cdf21a7899c66b240fdef14035"
+git-tree-sha1 = "fee018a29b60733876eb557804b5b109dd3dd8a7"
 uuid = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
-version = "0.6.7"
+version = "0.6.8"
 
 [[deps.LAME_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1123,9 +1123,9 @@ weakdeps = ["ChainRulesCore"]
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
-git-tree-sha1 = "2aded4182a14b19e9b62b063c0ab561809b5af2c"
+git-tree-sha1 = "fba11dbe2562eecdfcac49a05246af09ee64d055"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.8.0"
+version = "1.8.1"
 weakdeps = ["ChainRulesCore", "Statistics"]
 
     [deps.StaticArrays.extensions]
