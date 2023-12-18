@@ -271,7 +271,7 @@ groupedbar(
             "JSON\nobjecttable"], inner=2),
     [csvread1, csvread2, serializeread1, serializeread2, jdfread1, jdfread2, jlsoread1, jlsoread2,
         arrowread1, arrowread2, arrowread1 + arrowread1copy, arrowread2 + arrowread2copy,
-        # jsontablesaread1, jsontablesaread2,
+        ## jsontablesaread1, jsontablesaread2,
         jsontablesoread1, jsontablesoread2],
     group=repeat(["1st", "2nd"], outer=7),
     ylab="Second",
