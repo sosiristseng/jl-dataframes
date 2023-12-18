@@ -142,7 +142,11 @@ y = Arrow.Table("x.arrow") |> DataFrame
 eltype.(eachcol(y))
 
 # Note that columns of `y` are immutable
-y.A[1] = false
+try
+    y.A[1] = false
+catch e
+    show(e)
+end
 
 # This is because `Arrow.Table` uses memory mapping and thus uses a custom vector types:
 y.A
@@ -264,7 +268,7 @@ jsontablesoread2 = @elapsed @time open(jsontable, "bigdf2.json");
 
 #---
 
-## Exclude JSON\narraytable arraytable due to much longer timing
+## Exclude JSON arraytable due to much longer timing
 groupedbar(
     repeat(["CSV.jl", "Serialization", "JDF.jl", "JLSO.jl", "Arrow.jl", "Arrow.jl\ncopy", #"JSON\narraytable",
             "JSON\nobjecttable"], inner=2),

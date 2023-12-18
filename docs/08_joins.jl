@@ -99,7 +99,11 @@ df1 = DataFrame(id=[1, 2, missing], x=1:3)
 df2 = DataFrame(id=[1, missing, 3], y=1:3)
 
 #---
-innerjoin(df1, df2, on=:id)
+try
+    innerjoin(df1, df2, on=:id)
+catch e
+    show(e)
+end
 
 #---
 innerjoin(df1, df2, on=:id, matchmissing=:equal)

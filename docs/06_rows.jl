@@ -97,10 +97,14 @@ y = x[:, reverse(names(x))]
 #   `vcat` is still possible as it does column name matching
 vcat(x, y)
 
-#   but column names must still match
-vcat(x, y[:, 1:3])
+# but column names must still match
+try
+    vcat(x, y[:, 1:3])
+catch e
+    show(e)
+end
 
-#   unless you pass `:intersect`, `:union` or specific column names as keyword argument `cols`
+# unless you pass `:intersect`, `:union` or specific column names as keyword argument `cols`
 
 vcat(x, y[:, 1:3], cols=:intersect)
 
@@ -311,4 +315,8 @@ only(df)
 df2 = repeat(df, 2)
 
 #---
-only(df2)
+try
+    only(df2)
+catch e
+    show(e)
+end
