@@ -163,3 +163,8 @@ docs/site/
 LocalPreferences.toml
 *.arrow
 *.gz
+*.bin
+*.csv
+*.jdf/
+*.jlso
+*.json

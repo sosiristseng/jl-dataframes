@@ -210,9 +210,8 @@ jsontablesawrite2 = @elapsed @time open(io -> arraytable(io, bigdf), "bigdf1.jso
 println("JSONTables.jl objecttable")
 jsontablesowrite2 = @elapsed @time open(io -> objecttable(io, bigdf), "bigdf2.json", "w")
 
-#---
+# Exclude JSONTables.jl arraytable due to timing
 groupedbar(
-    # Exclude JSONTables.jl arraytable due to timing
     repeat(["CSV.jl", "Serialization", "JDF.jl", "JLSO.jl", "Arrow.jl", "JSONTables.jl\nobjecttable"],
         inner=2),
     [csvwrite1, csvwrite2, serializewrite1, serializewrite1, jdfwrite1, jdfwrite2,
@@ -266,9 +265,7 @@ jsontablesaread2 = @elapsed @time open(jsontable, "bigdf1.json")
 println("JSONTables.jl objecttable")
 jsontablesoread2 = @elapsed @time open(jsontable, "bigdf2.json");
 
-#---
-
-## Exclude JSON arraytable due to much longer timing
+# Exclude JSON arraytable due to much longer timing
 groupedbar(
     repeat(["CSV.jl", "Serialization", "JDF.jl", "JLSO.jl", "Arrow.jl", "Arrow.jl\ncopy", #"JSON\narraytable",
             "JSON\nobjecttable"], inner=2),
@@ -321,8 +318,8 @@ df1 = DataFrame(rand(1:10, 3, 4), :auto)
 #---
 df2 = DataFrame(rand(1:10, 3, 4), :auto)
 
-# And we show yet another way to write a `DataFrame` into a CSV file
-## write a CSV file into the zip file
+# And we show yet another way to write a `DataFrame` into a CSV file:
+# writing a CSV file into the zip file
 w = ZipFile.Writer("x.zip")
 
 f1 = ZipFile.addfile(w, "x1.csv")
