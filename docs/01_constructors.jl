@@ -13,11 +13,11 @@ First, we could create an empty DataFrame,
 DataFrame()
 
 # Or we could call the constructor using keyword arguments to add columns to the `DataFrame`.
-DataFrame(A=1:3, B=rand(3), C=randstring.([3,3,3]), fixed=1)
+DataFrame(A=1:3, B=rand(3), C=randstring.([3, 3, 3]), fixed=1)
 
 # note in column `:fixed` that scalars get automatically broadcasted.
 # We can create a `DataFrame` from a dictionary, in which case keys from the dictionary will be sorted to create the `DataFrame` columns.
-x = Dict("A" => [1,2], "B" => [true, false], "C" => ['a', 'b'], "fixed" => Ref([1,1]))
+x = Dict("A" => [1, 2], "B" => [true, false], "C" => ['a', 'b'], "fixed" => Ref([1, 1]))
 DataFrame(x)
 
 # This time we used `Ref` to protect a vector from being treated as a column and forcing broadcasting it into every row of `:fixed` column (note that the `[1,1]` vector is aliased in each row).
@@ -27,13 +27,13 @@ Rather than explicitly creating a dictionary first, as above, we could pass `Dat
 
 Note that in this case, we use `Symbol`s to denote the column names and arguments are not sorted. For example, `:A`, the symbol, produces `A`, the name of the first column here:
 ===#
-DataFrame(:A => [1,2], :B => [true, false], :C => ['a', 'b'])
+DataFrame(:A => [1, 2], :B => [true, false], :C => ['a', 'b'])
 
 # Although, in general, using `Symbol`s rather than strings to denote column names is preferred (as it is faster) DataFrames.jl accepts passing strings as column names, so this also works:
-DataFrame("A" => [1,2], "B" => [true, false], "C" => ['a', 'b'])
+DataFrame("A" => [1, 2], "B" => [true, false], "C" => ['a', 'b'])
 
 # You can also pass a vector of pairs, which is useful if it is constructed programatically:
-DataFrame([:A => [1,2], :B => [true, false], :C => ['a', 'b'], :fixed => "const"])
+DataFrame([:A => [1, 2], :B => [true, false], :C => ['a', 'b'], :fixed => "const"])
 
 # Here we create a `DataFrame` from a vector of vectors, and each vector becomes a column.
 DataFrame([rand(3) for i in 1:3], :auto)
@@ -64,13 +64,13 @@ n = (a=1:3, b=11:13)
 DataFrame(n)
 
 # Here we create a `DataFrame` from a matrix,
-DataFrame(rand(3,4), :auto)
+DataFrame(rand(3, 4), :auto)
 
 # and here we do the same but also pass column names.
-DataFrame(rand(3,4), Symbol.('a':'d'))
+DataFrame(rand(3, 4), Symbol.('a':'d'))
 
 # or
-DataFrame(rand(3,4), string.('a':'d'))
+DataFrame(rand(3, 4), string.('a':'d'))
 
 # This is how you can create a data frame with no rows, but with predefined columns and their types:
 DataFrame(A=Int[], B=Float64[], C=String[])
@@ -112,7 +112,7 @@ similar(x, 2)
 
 # You can also create a new `DataFrame` from `SubDataFrame` or `DataFrameRow` (discussed in detail later in the tutorial; in particular although `DataFrameRow` is considered a 1-dimensional object similar to a `NamedTuple` it gets converted to a 1-row `DataFrame` for convinience)
 x = DataFrame(a=1, b=1.0)
-sdf = view(x, [1,1], :)
+sdf = view(x, [1, 1], :)
 
 #---
 typeof(sdf)
@@ -141,7 +141,7 @@ Matrix(x)
 Array(x)
 
 # This would work even if the `DataFrame` had some `missing`s:
-x = DataFrame(x=1:2, y=[missing,"B"])
+x = DataFrame(x=1:2, y=[missing, "B"])
 
 #---
 Matrix(x)
@@ -153,7 +153,7 @@ x = DataFrame(x=1:2, y=3:4)
 Matrix(x)
 
 # In this next example, Julia correctly identifies that `Union` is needed to express the type of the resulting `Matrix` (which contains `missing`s).
-x = DataFrame(x=1:2, y=[missing,4])
+x = DataFrame(x=1:2, y=[missing, 4])
 
 #---
 Matrix(x)
@@ -226,12 +226,12 @@ DataFrame(nti)
 # ### Handling of duplicate column names
 # We can pass the `makeunique` keyword argument to allow passing duplicate names (they get deduplicated)
 
-df = DataFrame(:a=>1, :a=>2, :a_1=>3; makeunique=true)
+df = DataFrame(:a => 1, :a => 2, :a_1 => 3; makeunique=true)
 
 # Otherwise, duplicates are not allowed.
 
 try
-    df = DataFrame(:a=>1, :a=>2, :a_1=>3)
+    df = DataFrame(:a => 1, :a => 2, :a_1 => 3)
 catch e
     show(e)
 end

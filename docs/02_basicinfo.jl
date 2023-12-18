@@ -7,7 +7,7 @@ Let's start by creating a `DataFrame` object, `x`, so that we can learn how to g
 using DataFrames
 
 #---
-x = DataFrame(A = [1, 2], B = [1.0, missing], C = ["a", "b"])
+x = DataFrame(A=[1, 2], B=[1.0, missing], C=["a", "b"])
 
 # The standard `size` function works to get dimensions of the `DataFrame`,
 size(x), size(x, 1), size(x, 2)
@@ -53,13 +53,13 @@ last(y)
 df = DataFrame(rand(100, 100), :auto)
 
 # we can see that 92 of its columns were not printed. Also we get its first 30 rows. You can easily change this behavior by changing the value of `ENV["LINES"]` and `ENV["COLUMNS"]`.
-withenv("LINES"=>10, "COLUMNS" => 200) do
+withenv("LINES" => 10, "COLUMNS" => 200) do
     show(df)
 end
 
 # ### Most elementary get and set operations
 # Given the `DataFrame` `x` we have created earlier, here are various ways to grab one of its columns as a `Vector`.
-x = DataFrame(A = [1, 2], B = [1.0, missing], C = ["a", "b"])
+x = DataFrame(A=[1, 2], B=[1.0, missing], C=["a", "b"])
 
 # all get the vector stored in our DataFrame without copying it
 x.A, x[!, 1], x[!, :A]
@@ -99,7 +99,7 @@ x[1:2, 1:2] .= 1
 x
 
 # Assignment of a vector of length equal to the number of assigned rows using broadcasting
-x[1:2, 1:2] .= [1,2]
+x[1:2, 1:2] .= [1, 2]
 x
 
 # Assignment or of another data frame of matching size and column names, again using broadcasting:
@@ -133,7 +133,7 @@ x[:, Cols("x1", Between("x2", "x4"))]
 @view x[1:2, 1]
 
 #---
-@view x[1,1]
+@view x[1, 1]
 
 # a DataFrameRow, the same as for x[1, 1:2] without a view
 @view x[1, 1:2]
@@ -202,7 +202,7 @@ collect(pairs(eachcol(df)))
 using DataFrames
 
 #---
-df = DataFrame(rand(2,3), :auto)
+df = DataFrame(rand(2, 3), :auto)
 
 #---
 df2 = copy(df)
@@ -220,7 +220,7 @@ df == df3
 isapprox(df, df3)
 
 #---
-isapprox(df, df3, atol = eps()/2)
+isapprox(df, df3, atol=eps() / 2)
 
 # `missings` are handled as in Julia Base
 df = DataFrame(a=missing)
