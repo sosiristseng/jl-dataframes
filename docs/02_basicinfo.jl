@@ -185,7 +185,11 @@ end
 # note that for column `:b` we printed `2` as `3` was removed from it when we used `pop!` on column `:a`.
 # Such mistakes sometimes happen. Because of this DataFrames.jl performs consistency checks before doing an expensive operation (most notably before showing a data frame).
 
-df
+try
+    show(df)
+catch e
+    show(e)
+end
 
 # We can investigate the columns to find out what happend:
 collect(pairs(eachcol(df)))
