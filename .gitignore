@@ -167,4 +167,3 @@ LocalPreferences.toml
 *.csv
 *.jdf/
 *.jlso
-*.json
