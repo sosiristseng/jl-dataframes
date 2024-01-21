@@ -51,9 +51,10 @@ jobs:
         version: ${{ steps.read_toml.outputs.value }}
         show-versioninfo: 'true'
     - name: Cache Julia packages
-      uses: actions/cache/restore@v4
+      uses: actions/cache@v4
       id: cache-julia
       with:
+        save-always: 'true'
         path: |
           ~/.julia
           !~/.julia/registries
@@ -64,14 +65,6 @@ jobs:
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       run: |
         julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.precompile(); Pkg.gc(collect_delay=Day(0))'
-    - name: Save Julia packages
-      uses: actions/cache/save@v4
-      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
-      with:
-        path: |
-          ~/.julia
-          !~/.julia/registries
-        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run program
       run: julia --project=@. --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
