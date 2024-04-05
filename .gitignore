@@ -130,9 +130,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Local VSCode settings
-.vscode/
-
 # Julia DEPOT
 .julia/
 
@@ -161,10 +158,11 @@ docs/site/
 # environment.
 # Manifest.toml
 LocalPreferences.toml
+
+# Generated files
 *.arrow
 *.gz
 *.bin
 *.csv
 *.jdf/
 *.jlso
-*.json
