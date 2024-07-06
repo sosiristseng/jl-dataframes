@@ -326,3 +326,19 @@ df2_2 == df2
 # Note that once you read a given file from `z` object its stream is all used-up (reaching its end). Therefore to read it again you need to close the file object `z` and open it again.
 # Also do not forget to close the zip file once you are done.
 close(z)
+
+# Remove generated files
+rm("x.arrow")
+rm("x.bin")
+rm("x.zip")
+rm("x1.csv")
+rm("x1.json")
+rm("x2.json")
+rm("x.jdf", recursive=true)
+rm("df_compress_test.csv.gz")
+rm("bigdf1.json")
+rm("bigdf2.json")
+rm("bigdf2.csv")
+rm("bigdf2.jlso")
+rm("bigdf2.bin")
+rm("bigdf2.arrow")
