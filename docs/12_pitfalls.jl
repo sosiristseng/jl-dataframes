@@ -1,5 +1,6 @@
 # # Possible pitfalls
 using DataFrames
+using BenchmarkTools
 
 # ## Know what is copied when creating a DataFrame
 x = DataFrame(rand(3, 5), :auto)
@@ -69,7 +70,8 @@ s ## Will return BoundsError
 ```
 ===#
 
-# ## Single column selection for `DataFrame` creates aliases with ! and `getproperty` syntax and copies with :
+# ## Single column selection for a `DataFrame`
+# Single column selection for a `DataFrame` creates aliases with ! and `getproperty` syntax and copies with :
 x = DataFrame(a=1:3)
 x.b = x[!, 1] ## alias
 x.c = x[:, 1] ## copy
@@ -84,22 +86,11 @@ display(x)
 #===
 ## When iterating rows of a data frame
 
-- use `eachrow` to avoid compilation cost (wide tables),
-- but `Tables.namedtupleiterator` for fast execution (tall tables)
-
-this table is wide
+- use `eachrow` to avoid compilation cost in wide tables,
+- but `Tables.namedtupleiterator` for fast execution in tall tables
 ===#
-df1 = DataFrame([rand([1:2, 'a':'b', false:true, 1.0:2.0]) for i in 1:900], :auto)
 
-#---
-@time collect(eachrow(df1));
-
-#---
-@time collect(Tables.namedtupleiterator(df1));
-
-# as you can see the time to compile `Tables.namedtupleiterator` is very large in this case, and it would get much worse if the table was wider (that is why we include this tip in pitfalls notebook)
-
-# the table below is tall
+# The table below is tall:
 
 df2 = DataFrame(rand(10^6, 10), :auto)
 
