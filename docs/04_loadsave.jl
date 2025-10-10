@@ -3,7 +3,7 @@
 
 We do not cover all features of the packages. Please refer to their documentation to learn them.
 
-- https://github.com/ExpandingMan/Arrow.jl
+- https://github.com/apache/arrow-julia (Arrow.jl)
 - https://github.com/invenia/JLSO.jl
 - https://github.com/JuliaData/JSONTables.jl
 - https://github.com/xiaodaigh/JDF.jl
