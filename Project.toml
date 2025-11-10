@@ -22,6 +22,7 @@ Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
 
 [compat]
+Tables = "1.12.1"
 Arrow = "2.8.0"
 BenchmarkTools = "1.6.3"
 Chain = "0.6.0"
