@@ -14,12 +14,9 @@ Here we'll load `CSV.jl` to read and write CSV files and `Arrow.jl`, `JLSO.jl`, 
 using DataFrames
 using Arrow
 using CSV
-using Serialization
-using JLSO
 using JSONTables
 using CodecZlib
 using ZipFile
-using JDF
 using StatsPlots ## for charts
 using Mmap ## for compression
 
@@ -45,55 +42,8 @@ y = CSV.read("x1.csv", DataFrame)
 # Note that when loading in a `DataFrame` from a `CSV` the column type for columns `:C` `:D` have changed to use special strings defined in the InlineStrings.jl package.
 eltype.(eachcol(y))
 
-#===
-## Serialization by JDF.jl and JLSO.jl
-
-Now we use serialization to save `x`.
-
-There are two ways to perform serialization. The first way is to use the `Serialization.serialize` as below:
-
-Note that in general, this process _will not work_ if the reading and writing are done by different versions of Julia, or an instance of Julia with a different system image.
-===#
-open("x.bin", "w") do io
-    serialize(io, x)
-end
-
-# Now we load back the saved file to `y` variable. Again `y` is identical to `x`. However, please beware that if you session does not have DataFrames.jl loaded, then it may not recognize the content as DataFrames.jl
-y = open(deserialize, "x.bin")
-
-#---
-eltype.(eachcol(y))
-
-# ### JDF.jl
-# `JDF.jl` is a relatively new package designed to serialize DataFrames. You can save a DataFrame with the `savejdf` function.
-# For more details about design assumptions and limitations of `JDF.jl` please check out https://github.com/xiaodaigh/JDF.jl.
-JDF.save("x.jdf", x);
-
-# To load the saved JDF file, one can use the `loadjdf` function
-x_loaded = JDF.load("x.jdf") |> DataFrame
-
-# You can see that they are the same
-isequal(x_loaded, x)
-
-# JDF.jl offers the ability to load only certain columns from disk to help with working with large files.
-# set up a JDFFile which is a on disk representation of `x` backed by JDF.jl
-x_ondisk = jdf"x.jdf"
-
-# We can see all the names of `x` without loading it into memory
-names(x_ondisk)
-
-# The below is an example of how to load only columns `:A` and `:D`
-xd = JDF.load(x_ondisk; cols=["A", "D"]) |> DataFrame
-
-# ### JLSO.jl
-# Another way to perform serialization is by using the [JLSO.jl](https://github.com/invenia/JLSO.jl) library:
-JLSO.save("x.jlso", :data => x)
-
-# Now we can load back the file to `y`
-y = JLSO.load("x.jlso")[:data]
-
-#---
-eltype.(eachcol(y))
+# Clean the generated file
+rm("x1.csv")
 
 # ## JSONTables.jl
 # Often you might need to read and write data stored in JSON format. JSONTables.jl provides a way to process them in row-oriented or column-oriented layout. We present both options below.
@@ -119,6 +69,10 @@ y2 = open(jsontable, "x2.json") |> DataFrame
 
 #---
 eltype.(eachcol(y2))
+
+# Clean the generated files
+rm("x1.json")
+rm("x2.json")
 
 # ## Arrow.jl
 # Finally we use Apache Arrow format that allows, in particular, for data interchange with R or Python.
@@ -152,6 +106,9 @@ y2.A
 #---
 y2.B
 
+# Clean the generated file
+rm("x.arrow")
+
 # ## Basic benchmarking
 # Next, we'll create some files, so be careful that you don't already have these files in your working directory!
 # In particular, we'll time how long it takes us to write a `DataFrame` with 1000 rows and 100000 columns.
@@ -166,13 +123,7 @@ println("First run")
 
 #---
 println("CSV.jl")
-csvwrite1 = @elapsed @time CSV.write("bigdf1.csv", bigdf)
-println("Serialization")
-serializewrite1 = @elapsed @time open(io -> serialize(io, bigdf), "bigdf.bin", "w")
-println("JDF.jl")
-jdfwrite1 = @elapsed @time JDF.save("bigdf.jdf", bigdf)
-println("JLSO.jl")
-jlsowrite1 = @elapsed @time JLSO.save("bigdf.jlso", :data => bigdf)
+csvwrite1 = @elapsed @time CSV.write("bigdf1.csv.gz", bigdf; compress=true)
 println("Arrow.jl")
 arrowwrite1 = @elapsed @time Arrow.write("bigdf.arrow", bigdf)
 println("JSONTables.jl arraytable")
@@ -181,13 +132,7 @@ println("JSONTables.jl objecttable")
 jsontablesowrite1 = @elapsed @time open(io -> objecttable(io, bigdf), "bigdf2.json", "w")
 println("Second run")
 println("CSV.jl")
-csvwrite2 = @elapsed @time CSV.write("bigdf1.csv", bigdf)
-println("Serialization")
-serializewrite2 = @elapsed @time open(io -> serialize(io, bigdf), "bigdf.bin", "w")
-println("JDF.jl")
-jdfwrite2 = @elapsed @time JDF.save("bigdf.jdf", bigdf)
-println("JLSO.jl")
-jlsowrite2 = @elapsed @time JLSO.save("bigdf.jlso", :data => bigdf)
+csvwrite2 = @elapsed @time CSV.write("bigdf1.csv.gz", bigdf; compress=true)
 println("Arrow.jl")
 arrowwrite2 = @elapsed @time Arrow.write("bigdf.arrow", bigdf)
 println("JSONTables.jl arraytable")
@@ -197,21 +142,18 @@ jsontablesowrite2 = @elapsed @time open(io -> objecttable(io, bigdf), "bigdf2.js
 
 #---
 groupedbar(
-    repeat(["CSV.jl", "Serialization", "JDF.jl", "JLSO.jl", "Arrow.jl", "JSONTables.jl\nobjecttable"],
+    repeat(["CSV.jl (gz)", "Arrow.jl", "JSONTables.jl\nobjecttable"],
         inner=2),
-    [csvwrite1, csvwrite2, serializewrite1, serializewrite1, jdfwrite1, jdfwrite2,
-        jlsowrite1, jlsowrite2, arrowwrite1, arrowwrite2, jsontablesowrite2, jsontablesowrite2],
-    group=repeat(["1st", "2nd"], outer=6),
+    [csvwrite1, csvwrite2, arrowwrite1, arrowwrite2, jsontablesowrite1, jsontablesowrite2],
+    group=repeat(["1st", "2nd"], outer=3),
     ylab="Second",
-    title="Write Performance\nDataFrame: bigdf\nSize: $(size(bigdf))"
+    title="Write Performance\nDataFrame: bigdf\nSize: $(size(bigdf))",
+    permute = (:x, :y)
 )
 
 #---
-data_files = ["bigdf1.csv", "bigdf.bin", "bigdf.arrow", "bigdf1.json", "bigdf2.json"]
+data_files = ["bigdf1.csv.gz", "bigdf.arrow", "bigdf1.json", "bigdf2.json"]
 df = DataFrame(file=data_files, size=getfield.(stat.(data_files), :size))
-append!(df, DataFrame(file="bigdf.jdf", size=reduce((x, y) -> x + y.size,
-    stat.(joinpath.("bigdf.jdf", readdir("bigdf.jdf"))),
-    init=0)))
 sort!(df, :size)
 
 #---
@@ -220,13 +162,7 @@ sort!(df, :size)
 #---
 println("First run")
 println("CSV.jl")
-csvread1 = @elapsed @time CSV.read("bigdf1.csv", DataFrame)
-println("Serialization")
-serializeread1 = @elapsed @time open(deserialize, "bigdf.bin")
-println("JDF.jl")
-jdfread1 = @elapsed @time JDF.load("bigdf.jdf") |> DataFrame
-println("JLSO.jl")
-jlsoread1 = @elapsed @time JLSO.load("bigdf.jlso")
+csvread1 = @elapsed @time CSV.read("bigdf1.csv.gz", DataFrame)
 println("Arrow.jl")
 arrowread1 = @elapsed @time df_tmp = Arrow.Table("bigdf.arrow") |> DataFrame
 arrowread1copy = @elapsed @time copy(df_tmp)
@@ -235,13 +171,7 @@ jsontablesaread1 = @elapsed @time open(jsontable, "bigdf1.json")
 println("JSONTables.jl objecttable")
 jsontablesoread1 = @elapsed @time open(jsontable, "bigdf2.json")
 println("Second run")
-csvread2 = @elapsed @time CSV.read("bigdf1.csv", DataFrame)
-println("Serialization")
-serializeread2 = @elapsed @time open(deserialize, "bigdf.bin")
-println("JDF.jl")
-jdfread2 = @elapsed @time JDF.load("bigdf.jdf") |> DataFrame
-println("JLSO.jl")
-jlsoread2 = @elapsed @time JLSO.load("bigdf.jlso")
+csvread2 = @elapsed @time CSV.read("bigdf1.csv.gz", DataFrame)
 println("Arrow.jl")
 arrowread2 = @elapsed @time df_tmp = Arrow.Table("bigdf.arrow") |> DataFrame
 arrowread2copy = @elapsed @time copy(df_tmp)
@@ -252,35 +182,40 @@ jsontablesoread2 = @elapsed @time open(jsontable, "bigdf2.json");
 
 # Exclude JSONTables due to much longer timing
 groupedbar(
-    repeat(["CSV.jl", "Serialization", "JDF.jl", "JLSO.jl", "Arrow.jl", "Arrow.jl\ncopy", ##"JSON\narraytable",
+    repeat(["CSV.jl (gz)", "Arrow.jl", "Arrow.jl\ncopy", ##"JSON\narraytable",
             "JSON\nobjecttable"], inner=2),
-    [csvread1, csvread2, serializeread1, serializeread2, jdfread1, jdfread2, jlsoread1, jlsoread2,
-        arrowread1, arrowread2, arrowread1 + arrowread1copy, arrowread2 + arrowread2copy,
+    [csvread1, csvread2, arrowread1, arrowread2, arrowread1 + arrowread1copy, arrowread2 + arrowread2copy,
         ## jsontablesaread1, jsontablesaread2,
         jsontablesoread1, jsontablesoread2],
-    group=repeat(["1st", "2nd"], outer=7),
+    group=repeat(["1st", "2nd"], outer=4),
     ylab="Second",
-    title="Read Performance\nDataFrame: bigdf\nSize: $(size(bigdf))"
+    title="Read Performance\nDataFrame: bigdf\nSize: $(size(bigdf))",
+    permute = (:x, :y)
 )
 
+# Clean generated files
+rm("bigdf1.csv.gz")
+rm("bigdf1.json")
+rm("bigdf2.json")
+rm("bigdf.arrow")
+
 # ## Using gzip compression
-# A common user requirement is to be able to load and save CSV that are compressed using gzip. Below we show how this can be accomplished using `CodecZlib.jl`. The same pattern is applicable to `JSONTables.jl` compression/decompression.
+# A common user requirement is to be able to load and save CSV that are compressed using gzip. Below we show how this can be accomplished using `CodecZlib.jl`.
 # Again make sure that you do not have file named `df_compress_test.csv.gz` in your working directory.
 # We first generate a random data frame.
 df = DataFrame(rand(1:10, 10, 1000), :auto)
 
-# GzipCompressorStream comes from `CodecZlib`
-open("df_compress_test.csv.gz", "w") do io
-    stream = GzipCompressorStream(io)
-    CSV.write(stream, df)
-    close(stream)
-end
+# Use `CodecZlib` to compress the CSV file
+CSV.write("df_compress_test.csv.gz", df; compress=true)
 
 #---
-df2 = CSV.File(transcode(GzipDecompressor, Mmap.mmap("df_compress_test.csv.gz"))) |> DataFrame
+df2 = CSV.File("df_compress_test.csv.gz") |> DataFrame
 
 #---
 df == df2
+
+# Remove generated files
+rm("df_compress_test.csv.gz")
 
 # ## Using zip files
 # Sometimes you may have files compressed inside a zip file.
@@ -327,20 +262,5 @@ df2_2 == df2
 # Also do not forget to close the zip file once you are done.
 close(z)
 
-# Remove generated files
-rm("x.arrow")
-rm("x.bin")
+# Remove generated zip file
 rm("x.zip")
-rm("x.jlso")
-rm("x1.csv")
-rm("x1.json")
-rm("x2.json")
-rm("x.jdf", recursive=true)
-rm("bigdf.jdf", recursive=true)
-rm("df_compress_test.csv.gz")
-rm("bigdf1.json")
-rm("bigdf1.csv")
-rm("bigdf2.json")
-rm("bigdf.jlso")
-rm("bigdf.bin")
-rm("bigdf.arrow")
