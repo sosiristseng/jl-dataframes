@@ -123,7 +123,7 @@ println("First run")
 
 #---
 println("CSV.jl")
-csvwrite1 = @elapsed @time CSV.write("bigdf1.csv", bigdf)
+csvwrite1 = @elapsed @time CSV.write("bigdf1.csv.gz", bigdf; compress=true)
 println("Arrow.jl")
 arrowwrite1 = @elapsed @time Arrow.write("bigdf.arrow", bigdf)
 println("JSONTables.jl arraytable")
@@ -132,7 +132,7 @@ println("JSONTables.jl objecttable")
 jsontablesowrite1 = @elapsed @time open(io -> objecttable(io, bigdf), "bigdf2.json", "w")
 println("Second run")
 println("CSV.jl")
-csvwrite2 = @elapsed @time CSV.write("bigdf1.csv", bigdf)
+csvwrite2 = @elapsed @time CSV.write("bigdf1.csv.gz", bigdf; compress=true)
 println("Arrow.jl")
 arrowwrite2 = @elapsed @time Arrow.write("bigdf.arrow", bigdf)
 println("JSONTables.jl arraytable")
@@ -142,16 +142,17 @@ jsontablesowrite2 = @elapsed @time open(io -> objecttable(io, bigdf), "bigdf2.js
 
 #---
 groupedbar(
-    repeat(["CSV.jl", "Arrow.jl", "JSONTables.jl\nobjecttable"],
+    repeat(["CSV.jl (gz)", "Arrow.jl", "JSONTables.jl\nobjecttable"],
         inner=2),
     [csvwrite1, csvwrite2, arrowwrite1, arrowwrite2, jsontablesowrite1, jsontablesowrite2],
-    group=repeat(["1st", "2nd"], outer=6),
+    group=repeat(["1st", "2nd"], outer=3),
     ylab="Second",
-    title="Write Performance\nDataFrame: bigdf\nSize: $(size(bigdf))"
+    title="Write Performance\nDataFrame: bigdf\nSize: $(size(bigdf))",
+    permute = (:x, :y)
 )
 
 #---
-data_files = ["bigdf1.csv", "bigdf.arrow", "bigdf1.json", "bigdf2.json"]
+data_files = ["bigdf1.csv.gz", "bigdf.arrow", "bigdf1.json", "bigdf2.json"]
 df = DataFrame(file=data_files, size=getfield.(stat.(data_files), :size))
 sort!(df, :size)
 
@@ -161,7 +162,7 @@ sort!(df, :size)
 #---
 println("First run")
 println("CSV.jl")
-csvread1 = @elapsed @time CSV.read("bigdf1.csv", DataFrame)
+csvread1 = @elapsed @time CSV.read("bigdf1.csv.gz", DataFrame)
 println("Arrow.jl")
 arrowread1 = @elapsed @time df_tmp = Arrow.Table("bigdf.arrow") |> DataFrame
 arrowread1copy = @elapsed @time copy(df_tmp)
@@ -170,7 +171,7 @@ jsontablesaread1 = @elapsed @time open(jsontable, "bigdf1.json")
 println("JSONTables.jl objecttable")
 jsontablesoread1 = @elapsed @time open(jsontable, "bigdf2.json")
 println("Second run")
-csvread2 = @elapsed @time CSV.read("bigdf1.csv", DataFrame)
+csvread2 = @elapsed @time CSV.read("bigdf1.csv.gz", DataFrame)
 println("Arrow.jl")
 arrowread2 = @elapsed @time df_tmp = Arrow.Table("bigdf.arrow") |> DataFrame
 arrowread2copy = @elapsed @time copy(df_tmp)
@@ -181,40 +182,40 @@ jsontablesoread2 = @elapsed @time open(jsontable, "bigdf2.json");
 
 # Exclude JSONTables due to much longer timing
 groupedbar(
-    repeat(["CSV.jl", "Arrow.jl", "Arrow.jl\ncopy", ##"JSON\narraytable",
+    repeat(["CSV.jl (gz)", "Arrow.jl", "Arrow.jl\ncopy", ##"JSON\narraytable",
             "JSON\nobjecttable"], inner=2),
     [csvread1, csvread2, arrowread1, arrowread2, arrowread1 + arrowread1copy, arrowread2 + arrowread2copy,
         ## jsontablesaread1, jsontablesaread2,
         jsontablesoread1, jsontablesoread2],
-    group=repeat(["1st", "2nd"], outer=7),
+    group=repeat(["1st", "2nd"], outer=4),
     ylab="Second",
-    title="Read Performance\nDataFrame: bigdf\nSize: $(size(bigdf))"
+    title="Read Performance\nDataFrame: bigdf\nSize: $(size(bigdf))",
+    permute = (:x, :y)
 )
 
 # Clean generated files
-rm("bigdf1.csv")
+rm("bigdf1.csv.gz")
 rm("bigdf1.json")
 rm("bigdf2.json")
 rm("bigdf.arrow")
 
 # ## Using gzip compression
-# A common user requirement is to be able to load and save CSV that are compressed using gzip. Below we show how this can be accomplished using `CodecZlib.jl`. The same pattern is applicable to `JSONTables.jl` compression/decompression.
+# A common user requirement is to be able to load and save CSV that are compressed using gzip. Below we show how this can be accomplished using `CodecZlib.jl`.
 # Again make sure that you do not have file named `df_compress_test.csv.gz` in your working directory.
 # We first generate a random data frame.
 df = DataFrame(rand(1:10, 10, 1000), :auto)
 
-# GzipCompressorStream comes from `CodecZlib`
-open("df_compress_test.csv.gz", "w") do io
-    stream = GzipCompressorStream(io)
-    CSV.write(stream, df)
-    close(stream)
-end
+# Use `CodecZlib` to compress the CSV file
+CSV.write("df_compress_test.csv.gz", df; compress=true)
 
 #---
-df2 = CSV.File(transcode(GzipDecompressor, Mmap.mmap("df_compress_test.csv.gz"))) |> DataFrame
+df2 = CSV.File("df_compress_test.csv.gz") |> DataFrame
 
 #---
 df == df2
+
+# Remove generated files
+rm("df_compress_test.csv.gz")
 
 # ## Using zip files
 # Sometimes you may have files compressed inside a zip file.
@@ -261,5 +262,5 @@ df2_2 == df2
 # Also do not forget to close the zip file once you are done.
 close(z)
 
-# Remove generated files
-rm("df_compress_test.csv.gz")
+# Remove generated zip file
+rm("x.zip")
