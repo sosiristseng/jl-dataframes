@@ -1,0 +1,19 @@
+# Table of contents
+# https://jupyterbook.org/v1/structure/toc.html
+
+format: jb-book
+root: index
+chapters:
+- file: 01_constructors
+- file: 02_basicinfo
+- file: 03_missingvalues
+- file: 04_loadsave
+- file: 05_columns
+- file: 06_rows
+- file: 07_factors
+- file: 08_joins
+- file: 09_reshaping
+- file: 10_transforms
+- file: 11_performance
+- file: 12_pitfalls
+- file: 13_extras
