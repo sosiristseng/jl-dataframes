@@ -1,0 +1,27 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  title: Julia DataFrames
+  description: Julia DataFrames examples
+  # keywords: []
+  authors: ["Wen-Wei Tseng"]
+  license: CC-BY-4.0
+  open_access: true
+  settings:
+    output_matplotlib_strings: remove
+  github: https://github.com/sosiristseng/jl-dataframes
+  # bibliography:
+  #   - docs/references.bib
+  # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
+  # https://mystmd.org/guide/table-of-contents
+  toc:
+    - pattern: docs/*.ipynb
+site:
+  template: book-theme
+  options:
+    folders: true
+    logo_text: "JuliaBook Template"
+  # favicon: favicon.ico
+  # logo: site_logo.png
+  # style: ./my-style.css
+  nav: []

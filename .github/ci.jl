@@ -8,8 +8,6 @@ using SHA
     using Literate, JSON
 end
 
-
-
 # Strip SVG output from a Jupyter notebook
 @everywhere function strip_svg(nbpath)
     oldfilesize = filesize(nbpath)
