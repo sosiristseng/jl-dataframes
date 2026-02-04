@@ -20,7 +20,7 @@ site:
   template: book-theme
   options:
     folders: true
-    logo_text: "JuliaBook Template"
+    logo_text: "DataFrames"
   # favicon: favicon.ico
   # logo: site_logo.png
   # style: ./my-style.css
