@@ -55,7 +55,6 @@ jobs:
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       with:
         version: ${{ steps.julia-version.outputs.value }}
-        arch: ${{ runner.arch }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v5
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted'}}
@@ -67,11 +66,10 @@ jobs:
           ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
-      shell: julia --color=yes {0}
+      shell: julia --color=yes --project=@. {0}
       run: |
         using Pkg, Dates
-        Pkg.add(["JSON", "Literate", "MarkdownTables", "SHA", "Tables"])
-        Pkg.activate(".")
+        Pkg.Registry.update()
         Pkg.instantiate()
         Pkg.resolve()
         Pkg.precompile()
