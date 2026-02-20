@@ -859,9 +859,9 @@ version = "0.2.4"
 
 [[deps.MultivariateStats]]
 deps = ["Arpack", "Distributions", "LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI", "StatsBase"]
-git-tree-sha1 = "816620e3aac93e5b5359e4fdaf23ca4525b00ddf"
+git-tree-sha1 = "7c3ff68a904d0f7404e5d2f7f5bc667934d8d616"
 uuid = "6f286f6a-111f-5878-ab1e-185364afe411"
-version = "0.10.3"
+version = "0.10.4"
 
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
@@ -1240,9 +1240,9 @@ version = "1.0.4"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
-git-tree-sha1 = "eee1b9ad8b29ef0d936e3ec9838c7ec089620308"
+git-tree-sha1 = "0f529006004a8be48f1be25f3451186579392d47"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.9.16"
+version = "1.9.17"
 weakdeps = ["ChainRulesCore", "Statistics"]
 
     [deps.StaticArrays.extensions]
