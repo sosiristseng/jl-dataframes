@@ -15,7 +15,7 @@ project:
   # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
   # https://mystmd.org/guide/table-of-contents
   toc:
-    - pattern: docs/*.ipynb
+    - pattern: "*.ipynb"
 site:
   template: book-theme
   options:
