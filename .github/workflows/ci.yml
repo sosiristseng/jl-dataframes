@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  CACHE_NUM: '1'
   LITERATE_PROC: '4'
   JULIA_CI: 'true'
   # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
@@ -22,21 +23,22 @@ env:
 jobs:
   CI:
     runs-on: ubuntu-24.04-arm
-    permissions:
-      actions: write
-      contents: read
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
-    - name: Read Julia version
-      uses: julia-actions/julia-version@main
-      id: julia-version
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      id: setup-python
       with:
-        versions: manifest
-    - name: Get hashes
+        python-version: 3.x
+    - name: Read Julia version
+      id: julia-version
+      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
+    - name: Get environment hashes
       id: hash
       run: |
-        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
+        echo "jl=${{ runner.os }}-${{ runner.arch }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
+        echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v5
@@ -45,18 +47,23 @@ jobs:
         path: |
           ${{ env.NBCACHE }}/**/*.ipynb
           ${{ env.NBCACHE }}/**/*.sha
-        key: notebook-${{ steps.hash.outputs.value }}-${{ steps.hash.outputs.nb }}
+        key: notebook-${{ steps.hash.outputs.env }}-${{ steps.hash.outputs.nb }}
         restore-keys: |
-          notebook-${{ steps.hash.outputs.value }}-
+          notebook-${{ steps.hash.outputs.env }}-
     - name: Setup Julia
       uses: julia-actions/setup-julia@v3
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       with:
         version: ${{ steps.julia-version.outputs.resolved }}
-    - name: Cache Julia packages
-      uses: julia-actions/cache@v3
+    - name: Restore Julia package cache
+      uses: actions/cache/restore@v5
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' }}
       id: cache-julia
+      with:
+        path: ~/.julia
+        key: ${{ steps.hash.outputs.jl }}-${{ steps.hash.outputs.env }}
+        restore-keys: |
+          ${{ steps.hash.outputs.jl }}-
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
       shell: julia --color=yes --project=@. {0}
@@ -82,6 +89,12 @@ jobs:
       uses: actions/upload-pages-artifact@v5
       with:
         path: 'docs/_build/html'
+    - name: Save Julia package cache
+      uses: actions/cache/save@v5
+      if: ${{ always() && steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
+      with:
+        path: ~/.julia
+        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
 
   # Deployment job
   deploy:
