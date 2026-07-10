@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "7172e5ecd1f124ad8663f24aa48107df80bf8d9f"
+project_hash = "872ba2ea17e292c54b217c02a19c736a0eaa8e06"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -677,9 +677,9 @@ version = "1.0.0"
 
 [[deps.JLD2]]
 deps = ["ChunkCodecLibZlib", "ChunkCodecLibZstd", "FileIO", "MacroTools", "Mmap", "OrderedCollections", "PrecompileTools", "ScopedValues"]
-git-tree-sha1 = "941f87a0ae1b14d1ac2fa57245425b23a9d7a516"
+git-tree-sha1 = "9ebadf3f8f0de07031359917549bbdadc23f5dc3"
 uuid = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
-version = "0.6.4"
+version = "0.6.5"
 
     [deps.JLD2.extensions]
     UnPackExt = "UnPack"
