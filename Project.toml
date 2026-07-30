@@ -25,27 +25,3 @@ ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
 
 [workspace]
 projects = ["Startup"]
-
-[compat]
-Arrow = "2.8.1"
-BenchmarkTools = "1.8.0"
-CSV = "0.10.16"
-CategoricalArrays = "1.1.1"
-Chain = "1.0.0"
-CodecZlib = "0.7.8"
-DataFrames = "1.8.2"
-DataFramesMeta = "0.15.6"
-FileIO = "1.19.0"
-FreqTables = "1.0.0"
-JLD2 = "0.6.5"
-JSON = "1.6.1"
-JSONTables = "1.0.3"
-Literate = "2.21.0"
-MarkdownTables = "1.1.0"
-PooledArrays = "1.4.3"
-SHA = "0.7.0"
-Statistics = "1.11.1"
-StatsBase = "0.34.12"
-StatsPlots = "0.15.8"
-Tables = "1.13.0"
-ZipFile = "0.10.1"
