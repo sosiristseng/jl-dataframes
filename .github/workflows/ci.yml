@@ -12,43 +12,31 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CACHE_NUM: '2'
-  LITERATE_PROC: '2'
+  CACHE_NUM: '1'
+  LITERATE_PROC: '4'
   JULIA_CI: 'true'
-  JULIA_NUM_THREADS: '2'
+  JULIA_NUM_THREADS: '1'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  JULIA_CONDAPKG_ENV: '@mpl'
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04-arm
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
-    - name: Setup Python
-      uses: actions/setup-python@v7
-      id: setup-python
-      with:
-        python-version: 3.x
     - name: Read Julia version
-      uses: julia-actions/julia-version@v0.1.0
       id: julia-version
-      with:
-        versions: manifest
+      run: echo "resolved=$(awk -F '"' '/^[[:space:]]*julia_version/ {print $2}' Manifest.toml)" >> "$GITHUB_OUTPUT"
     - name: Get environment hashes
       id: hash
       run: |
         echo "jl=${{ runner.os }}-${{ runner.arch }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
         echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
-    # https://github.com/jupyter/docker-stacks/blob/main/images/minimal-notebook/setup-scripts/setup-julia-packages.bash
     - name: Set Julia CPU target (x64)
-      if: runner.arch == 'X64'
-      run: echo 'JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)' >> $GITHUB_ENV
-    - name: Set Julia CPU target (ARM64)
-      if: runner.arch == 'ARM64'
-      run: echo 'JULIA_CPU_TARGET=generic;cortex-a57;thunderx2t99;carmel,clone_all;apple-m1,base(3);neoverse-512tvb,base(3)' >> $GITHUB_ENV
+      if: ${{ runner.arch == 'X64' }}
+      run: echo 'JULIA_CPU_TARGET=sysimage' >> $GITHUB_ENV
     - name: Cache executed notebooks
       uses: actions/cache@v6
       id: cache-nb
@@ -76,7 +64,7 @@ jobs:
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
       shell: julia --color=yes --project=@. {0}
-      run: using Pkg; Pkg.instantiate()
+      run: using Pkg; Pkg.instantiate(); Pkg.precompile()
     - name: Save Julia package cache
       uses: actions/cache/save@v6
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
